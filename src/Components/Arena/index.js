@@ -13,6 +13,8 @@ const Arena = ({ characterNFT, setCharacterNFT }) => {
   const [boss, setBoss] = useState(null);
   const [attackState, setAttackState] = useState("");
   const [showToast, setShowToast] = useState(false);
+  const [isHealing, setIsHealing] = useState(false);
+
   const runAttackAction = async () => {
     try {
       // コントラクトが呼び出されたことを確認します。
@@ -40,6 +42,18 @@ const Arena = ({ characterNFT, setCharacterNFT }) => {
       setAttackState("");
     }
   };
+
+  const healingAction = async () => {
+    if (gameContract) {
+      const healingTxn = await gameContract.healing();
+      setIsHealing(true);
+      await healingTxn.wait();
+      console.log("回復完了", healingTxn);
+
+      setIsHealing(false);
+    }
+  };
+
   useEffect(() => {
     // ボスのデータをコントラクトから読み込む関数を設定します。
     const fetchBoss = async () => {
@@ -93,11 +107,13 @@ const Arena = ({ characterNFT, setCharacterNFT }) => {
         myEpicGame.abi,
         signer
       );
+
       setGameContract(gameContract);
     } else {
       console.log("Ethereum object not found");
     }
   }, []);
+
   return (
     <div className="arena-container">
       {/* 攻撃ダメージの通知を追加します */}
@@ -146,15 +162,38 @@ const Arena = ({ characterNFT, setCharacterNFT }) => {
                   alt={`Character ${characterNFT.name}`}
                 />
                 <div className="health-bar">
-                  <progress value={characterNFT.hp} max={characterNFT.maxHp} />
-                  <p>{`${characterNFT.hp} / ${characterNFT.maxHp} HP`}</p>
+                  {isHealing ? (
+                    <p>回復中</p>
+                  ) : (
+                    <>
+                      <progress
+                        value={characterNFT.hp}
+                        max={characterNFT.maxHp}
+                      />
+                      <p>{`${characterNFT.hp} / ${characterNFT.maxHp} HP`}</p>
+                    </>
+                  )}
                 </div>
               </div>
               <div className="stats">
                 <h4>{`⚔️ Attack Damage: ${characterNFT.attackDamage}`}</h4>
               </div>
             </div>
+            {isHealing ? (
+              <button
+                disabled
+                className="healing-button"
+                onClick={healingAction}
+              >
+                回復中
+              </button>
+            ) : (
+              <button className="healing-button" onClick={healingAction}>
+                回復
+              </button>
+            )}
           </div>
+
           {/* <div className="active-players">
             <h2>Active Players</h2>
             <div className="players-list">{renderActivePlayersList()}</div>

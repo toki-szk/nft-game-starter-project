@@ -46,6 +46,19 @@
   color: white;
 }
 
+.healing-button {
+  height: 45px;
+  border: 0;
+  width: auto;
+  padding-left: 40px;
+  padding-right: 40px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: bold;
+  color: white;
+}
+
 .connect-wallet-container {
   display: flex;
   flex-direction: column;
